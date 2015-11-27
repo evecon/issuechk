@@ -33,19 +33,52 @@ SOFTWARE.
 package main
 
 import (
+	"bufio"
+	"flag"
 	"fmt"
 	"github.com/google/go-github/github"
+	"os"
+	"regexp"
+	"strconv"
 )
 
-func main() {
-	client := github.NewClient(nil)
+// https://github.com/evecon/issuechk/issues/1 https://github.com/evecon/issuechk/issues/2
+func scanFile(client *github.Client, path string) {
+	inFile, _ := os.Open(path)
+	defer inFile.Close()
+	scanner := bufio.NewScanner(inFile)
+	scanner.Split(bufio.ScanLines)
 
-	for i := 0; i < 100; i++ {
-		issue, _, err := client.Issues.Get("go-swagger", "go-swagger", i)
-		if err != nil {
-			fmt.Errorf("Issues.Get returned error: %v", err)
-		} else {
-			fmt.Println(*issue.Number, " ", *issue.State)
+	r, _ := regexp.Compile("https://github.com/([^/ ]+)/([^/ ]+)/issues/([0-9]+)")
+
+	for ln := uint(0); scanner.Scan(); ln++ {
+		for _, result := range r.FindAllStringSubmatch(scanner.Text(), -1) {
+			checkIssue(client, path, ln, result[1], result[2], result[3])
 		}
 	}
+}
+
+func checkIssue(client *github.Client, path string, ln uint, org, repo, issueStr string) {
+	issueNumber, perr := strconv.ParseInt(issueStr, 0, 32)
+	if perr != nil {
+		fmt.Printf("%s:%d: github.com/%s/%s issue #%s: error: %v\n",
+			path, ln, org, repo, issueStr, perr)
+	}
+
+	issue, _, err := client.Issues.Get(org, repo, int(issueNumber))
+	if err != nil {
+		fmt.Printf("%s:%d: github.com/%s/%s issue #%s: error: %v\n",
+			path, ln, org, repo, issue, err)
+	} else {
+		fmt.Printf("%s:%d: github.com/%s/%s issue #%s is %s\n",
+			path, ln, org, repo, issue, *issue.State)
+	}
+}
+
+func main() {
+	flag.Parse()
+	path := flag.Arg(0)
+	client := github.NewClient(nil)
+
+	scanFile(client, path)
 }
