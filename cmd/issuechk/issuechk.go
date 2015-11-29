@@ -36,7 +36,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/google/go-github/github"
+	"github.com/evecon/issuechk/Godeps/_workspace/src/github.com/google/go-github/github"
 	"os"
 	"regexp"
 	"strconv"
