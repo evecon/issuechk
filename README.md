@@ -24,7 +24,7 @@ day you use *issuechk*.
 
 ## Download
 
-[TBD]
+Download a binary for you OS and platform from the [latest](https://github.com/evecon/issuechk/releases/latest) release.
 
 
 ## Quick start
@@ -34,6 +34,12 @@ To check one file, run:
 ```
 issuechk program.c
 ```
+
+## This release
+
+- Search issues of the _GitHub_ hosted projects.
+- Consume one issue link format `https://github.com/([^/ ]+)/([^/ ]+)/issues/([0-9]+)`.
+- Output in format `file:line github.com/{organization}/{repository} issue {issueNumber} is {state}` per issue.
 
 
 ## Build from sources
