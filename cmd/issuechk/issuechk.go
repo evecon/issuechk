@@ -68,17 +68,39 @@ func checkIssue(client *github.Client, path string, ln uint, org, repo, issueStr
 	issue, _, err := client.Issues.Get(org, repo, int(issueNumber))
 	if err != nil {
 		fmt.Printf("%s:%d: github.com/%s/%s issue #%s: error: %v\n",
-			path, ln, org, repo, issue, err)
+			path, ln, org, repo, issueStr, err)
 	} else {
 		fmt.Printf("%s:%d: github.com/%s/%s issue #%s is %s\n",
-			path, ln, org, repo, issue, *issue.State)
+			path, ln, org, repo, issueStr, *issue.State)
 	}
+}
+
+var Version = "amnesiac"
+
+func showVersionInfo() {
+	fmt.Println("issuechk", Version)
+}
+
+var showVersion = false
+
+func init() {
+	const (
+		showVersionUsage = "print version"
+	)
+	flag.BoolVar(&showVersion, "version", showVersion, showVersionUsage)
 }
 
 func main() {
 	flag.Parse()
-	path := flag.Arg(0)
-	client := github.NewClient(nil)
+	if showVersion {
+		showVersionInfo()
+		return
+	}
 
-	scanFile(client, path)
+	path := flag.Arg(0)
+
+	if len(path) > 0 {
+		client := github.NewClient(nil)
+		scanFile(client, path)
+	}
 }
