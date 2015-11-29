@@ -35,6 +35,14 @@ To check one file, run:
 issuechk program.c
 ```
 
+And you will see something like this:
+
+```
+cmd/issuechk/issuechk.go:44: github.com/evecon/issuechk issue #1 is closed
+cmd/issuechk/issuechk.go:44: github.com/evecon/issuechk issue #2 is open
+```
+
+
 ## This release
 
 - Search issues of the _GitHub_ hosted projects.
